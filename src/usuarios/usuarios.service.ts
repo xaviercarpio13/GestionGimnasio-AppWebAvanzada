@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
@@ -31,10 +32,17 @@ export class UsuariosService {
             correoRecuperacion: createUserDto.cuenta.correoRecuperacion,
           },
         },
+        suscripcion: createUserDto.suscripcion ? {
+          create: {
+            tipo: createUserDto.suscripcion.create.tipo, // Usando el tipo de enum
+            fechaFin:SubscriptionsService.calcularFechaFin(createUserDto.suscripcion.create.tipo),
+          },
+        } : undefined, // Solo crea la suscripción si se ha proporcionado
       },
       include: {
         cuenta: true,
         rol: true,
+        suscripcion: true,
       },
     });
   }
