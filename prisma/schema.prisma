@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://xavier:admin123@localhost:5432/gimnasioEPN?schema=public"
+  url      = env("DATABASE_URL")
 }
 
 model Rol {
