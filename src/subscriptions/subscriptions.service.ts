@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
+import { TipoSuscripcion } from '@prisma/client';
 
 @Injectable()
 export class SubscriptionsService {
+ 
   constructor(private prisma: PrismaService) {}
 
   create(createSubscriptionDto: CreateSubscriptionDto & { fechaFin: Date }) {
@@ -11,7 +13,7 @@ export class SubscriptionsService {
       data: {
         usuarioId: createSubscriptionDto.usuarioId,
         tipo: createSubscriptionDto.tipo,
-        fechaFin: this.calcularFechaFin(createSubscriptionDto.tipo),
+        fechaFin: SubscriptionsService.calcularFechaFin(createSubscriptionDto.tipo),
       },
     });
   }
@@ -48,13 +50,13 @@ export class SubscriptionsService {
     });
   }
 
-  async renovar(tipoSuscripcion: string, id: number) {
+  async renovar(tipoSuscripcion: TipoSuscripcion, id: number) {
     const suscripcion = await this.findOne(id);
     if (!suscripcion) {
       throw new Error(`La suscripción con id ${id} no existe.`);
     }
 
-    const nuevaFechaFin = this.calcularFechaFin(tipoSuscripcion);
+    const nuevaFechaFin = SubscriptionsService.calcularFechaFin(tipoSuscripcion);
     return this.prisma.suscripcion.update({
       where: { id },
       data: {
@@ -63,34 +65,34 @@ export class SubscriptionsService {
     });
   }
 
-  private calcularFechaFin(
-    tipoSuscripcion: string,
+  public static calcularFechaFin(
+    tipoSuscripcion: TipoSuscripcion,
     fechaInicio: Date = new Date(),
   ): Date {
     const fechaFin = new Date(fechaInicio);
 
-    switch (tipoSuscripcion.toUpperCase()) {
-      case 'SEMANAL':
+    switch (tipoSuscripcion) {
+      case TipoSuscripcion.SEMANAL:
         fechaFin.setDate(fechaFin.getDate() + 7);
         break;
-      case 'MENSUAL':
+      case TipoSuscripcion.MENSUAL:
         fechaFin.setMonth(fechaFin.getMonth() + 1);
         break;
-      case 'TRIMESTRAL':
+      case TipoSuscripcion.TRIMESTRAL:
         fechaFin.setMonth(fechaFin.getMonth() + 3);
         break;
-      case 'SEMESTRAL':
+      case TipoSuscripcion.SEMESTRAL:
         fechaFin.setMonth(fechaFin.getMonth() + 6);
         break;
-      case 'ANUAL':
+      case TipoSuscripcion.ANUAL:
         fechaFin.setFullYear(fechaFin.getFullYear() + 1);
         break;
       default:
         throw new Error(
-          `Tipo de suscripción "${tipoSuscripcion}" no es válido.`,
+          `Tipo de suscripción "${tipoSuscripcion}" no es válido.`
         );
     }
-
+  
     return fechaFin;
-  }
+}
 }

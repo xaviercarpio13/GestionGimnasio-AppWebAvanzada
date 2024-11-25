@@ -1,4 +1,6 @@
-import { IsString, IsNotEmpty, IsDateString, IsInt } from 'class-validator';
+import { TipoSuscripcion } from '@prisma/client';
+import { IsString, IsNotEmpty, IsDateString, IsInt, IsEnum } from 'class-validator';
+
 
 export class CreateUserDto {
   @IsInt()
@@ -24,5 +26,12 @@ export class CreateUserDto {
     password: string;
     correoRecuperacion: string;
   };
+  @IsEnum(TipoSuscripcion) // Validación para que el tipo de suscripción sea uno de los valores del enum
+  suscripcion?: {
+    create: {
+      tipo: TipoSuscripcion;
+    }
+  };
+
 }
 // create-user.dto.ts
