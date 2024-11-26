@@ -10,7 +10,7 @@ export class RecuperarPasswordService {
   ) {}
 
   // Método para manejar la recuperación de contraseña
-  async handlePasswordRecovery(email: string, idUsuario: number) {
+  async handlePasswordRecovery(email: string) {
     // Genera un código aleatorio como nueva contraseña temporal
     const newPassword = this.generateRandomCode();
 
@@ -23,7 +23,7 @@ export class RecuperarPasswordService {
       );
 
       // Actualiza la contraseña del usuario
-      await this.userService.updateUserPassword(idUsuario, newPassword);
+      await this.userService.updateUserPassword(email, newPassword);
     } catch (error) {
       console.error('Error en la recuperación de contraseña:', error);
       throw error;

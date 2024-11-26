@@ -6,10 +6,10 @@ export class RecuperarPasswordController {
   constructor(private readonly recuperarPasswordService: RecuperarPasswordService) {}
 
   @Post('send')
-  async sendEmail(@Body() body: { email: string; idUsuario: number }) {
-    const { email, idUsuario } = body;
+  async sendEmail(@Body() body: { email: string}) {
+    const { email} = body;
 
-    if (!email || !idUsuario) {
+    if (!email) {
       throw new HttpException(
         'Faltan parámetros requeridos (email, idUsuario).',
         HttpStatus.BAD_REQUEST,
@@ -18,7 +18,7 @@ export class RecuperarPasswordController {
 
     try {
       // Llama al servicio para procesar la solicitud
-      await this.recuperarPasswordService.handlePasswordRecovery(email, idUsuario);
+      await this.recuperarPasswordService.handlePasswordRecovery(email);
 
       return { message: `Correo enviado exitosamente a ${email}.` };
     } catch (error) {

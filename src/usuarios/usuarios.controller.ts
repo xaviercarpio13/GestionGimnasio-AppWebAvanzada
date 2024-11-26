@@ -49,11 +49,11 @@ export class UsersController {
 
   @Put('update-password')
   async updatePassword(
-    @Body() body: { userId: number; newPassword: string }
+    @Body() body: { correo: string; newPassword: string }
   ) {
-    const { userId, newPassword } = body;
+    const { correo, newPassword } = body;
 
-    if (!userId || !newPassword) {
+    if (!correo || !newPassword) {
       throw new HttpException(
         'El userId y la newPassword son requeridos.',
         HttpStatus.BAD_REQUEST,
@@ -62,8 +62,7 @@ export class UsersController {
 
     try {
       const updatedUser = await this.usersService.updateUserPassword(
-        userId,
-        newPassword,
+        correo,newPassword,
       );
 
       return {

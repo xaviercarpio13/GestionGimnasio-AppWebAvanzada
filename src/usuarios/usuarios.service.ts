@@ -99,12 +99,12 @@ export class UsuariosService {
       },
     });
   }
-  async updateUserPassword(userId: number, newPassword: string) {
+  async updateUserPassword(correo: string, newPassword: string) {
     const hashedPassword = await this.hashPassword(newPassword);
 
     return this.prisma.cuenta.update({
       where: {
-        usuarioId: userId,
+        correoRecuperacion: correo,
       },
       data: {
         password: hashedPassword,
