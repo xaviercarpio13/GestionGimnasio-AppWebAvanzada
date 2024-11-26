@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Put,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -42,5 +45,36 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
+  }
+
+  @Put('update-password')
+  async updatePassword(
+    @Body() body: { userId: number; newPassword: string }
+  ) {
+    const { userId, newPassword } = body;
+
+    if (!userId || !newPassword) {
+      throw new HttpException(
+        'El userId y la newPassword son requeridos.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      const updatedUser = await this.usersService.updateUserPassword(
+        userId,
+        newPassword,
+      );
+
+      return {
+        message: 'Contraseña actualizada exitosamente.',
+        user: updatedUser,
+      };
+    } catch (error) {
+      throw new HttpException(
+        `Error al actualizar la contraseña: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

@@ -1,34 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { RecuperarPasswordService } from './recuperar-password.service';
-import { CreateRecuperarPasswordDto } from './dto/create-recuperar-password.dto';
-import { UpdateRecuperarPasswordDto } from './dto/update-recuperar-password.dto';
 
 @Controller('recuperar-password')
 export class RecuperarPasswordController {
   constructor(private readonly recuperarPasswordService: RecuperarPasswordService) {}
 
-  @Post()
-  create(@Body() createRecuperarPasswordDto: CreateRecuperarPasswordDto) {
-    return this.recuperarPasswordService.create(createRecuperarPasswordDto);
-  }
+  @Post('send')
+  async sendEmail(@Body() body: { email: string; idUsuario: number }) {
+    const { email, idUsuario } = body;
 
-  @Get()
-  findAll() {
-    return this.recuperarPasswordService.findAll();
-  }
+    if (!email || !idUsuario) {
+      throw new HttpException(
+        'Faltan parámetros requeridos (email, idUsuario).',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.recuperarPasswordService.findOne(+id);
-  }
+    try {
+      // Llama al servicio para procesar la solicitud
+      await this.recuperarPasswordService.handlePasswordRecovery(email, idUsuario);
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRecuperarPasswordDto: UpdateRecuperarPasswordDto) {
-    return this.recuperarPasswordService.update(+id, updateRecuperarPasswordDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recuperarPasswordService.remove(+id);
+      return { message: `Correo enviado exitosamente a ${email}.` };
+    } catch (error) {
+      throw new HttpException(
+        `Error al procesar la solicitud: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

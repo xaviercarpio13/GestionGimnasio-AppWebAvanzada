@@ -15,32 +15,27 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { RecuperarPasswordModule } from './recuperar-password/recuperar-password.module';
+import { RecuperarPasswordController } from './recuperar-password/recuperar-password.controller';
+import { RecuperarPasswordService } from './recuperar-password/recuperar-password.service';
 
 @Module({
   imports: [
-      MailerModule.forRoot({
-        transport: {
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false, // Usar `true` para 465, o `false` para otros puertos
-          auth: {
-            user: 'appgymgestion@hotmail.com', // Tu correo
-            pass: 'appPassword', // Contraseña o token de aplicación
-          },
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
         },
-        defaults: {
-          from: '"No Reply" <no-reply@tuapp.com>', // Dirección de correo por defecto
-        },
-        template: {
-          dir: join(__dirname, 'templates'), // Ruta donde estarán tus plantillas
-          adapter: new HandlebarsAdapter(), // Motor de plantillas
-          options: {
-            strict: true,
-          },
-        },
-      }),
-    UsersModule, PrismaModule, RolesModule, SubscriptionsModule, LoginModule, ChatWebsocketModule, RecuperarPasswordModule],
-  controllers: [UsersController, RolesController, SubscriptionsController],
-  providers: [UsuariosService, PrismaService, SubscriptionsService],
+      },
+      defaults: {
+        from: `"App Gym Gestión" <${process.env.MAIL_USER}>`,
+      },
+    }),
+    UsersModule, PrismaModule, RolesModule, SubscriptionsModule, LoginModule, ChatWebsocketModule, RecuperarPasswordModule ],
+  controllers: [UsersController, RolesController, SubscriptionsController, RecuperarPasswordController],
+  providers: [UsuariosService, PrismaService, SubscriptionsService,RecuperarPasswordService],
 })
 export class AppModule {}

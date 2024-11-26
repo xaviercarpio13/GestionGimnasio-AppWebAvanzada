@@ -1,26 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRecuperarPasswordDto } from './dto/create-recuperar-password.dto';
-import { UpdateRecuperarPasswordDto } from './dto/update-recuperar-password.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { UsuariosService } from 'src/usuarios/usuarios.service';
 
 @Injectable()
 export class RecuperarPasswordService {
-  create(createRecuperarPasswordDto: CreateRecuperarPasswordDto) {
-    return 'This action adds a new recuperarPassword';
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly userService: UsuariosService, // Servicio externo para actualizar la contraseña
+  ) {}
+
+  // Método para manejar la recuperación de contraseña
+  async handlePasswordRecovery(email: string, idUsuario: number) {
+    // Genera un código aleatorio como nueva contraseña temporal
+    const newPassword = this.generateRandomCode();
+
+    try {
+      // Enviar el correo con la nueva contraseña
+      await this.sendPlainTextEmail(
+        email,
+        'Recuperación de contraseña de Gym App',
+        `Tu nueva contraseña temporal es: ${newPassword}`,
+      );
+
+      // Actualiza la contraseña del usuario
+      await this.userService.updateUserPassword(idUsuario, newPassword);
+    } catch (error) {
+      console.error('Error en la recuperación de contraseña:', error);
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all recuperarPassword`;
+  // Método para enviar correos en texto plano
+  async sendPlainTextEmail(to: string, subject: string, content: string) {
+    try {
+      await this.mailerService.sendMail({
+        to, // Dirección del destinatario
+        subject, // Asunto
+        text: content, // Contenido en texto plano
+      });
+      console.log(`Correo enviado a ${to}`);
+    } catch (error) {
+      console.error('Error enviando el correo:', error);
+      throw error;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recuperarPassword`;
-  }
-
-  update(id: number, updateRecuperarPasswordDto: UpdateRecuperarPasswordDto) {
-    return `This action updates a #${id} recuperarPassword`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} recuperarPassword`;
+  // Método para generar un código aleatorio
+  private generateRandomCode(): string {
+    return Math.random().toString(36).slice(2, 10); // Genera un string aleatorio de 8 caracteres
   }
 }
