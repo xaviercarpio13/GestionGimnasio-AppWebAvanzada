@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  const host = '26.172.2.131'; // Cambia por la IP que quieras usar
+  const host = 'localhost'; // Cambia por la IP que quieras usar
   const port = 3000;
 
   app.enableCors({
