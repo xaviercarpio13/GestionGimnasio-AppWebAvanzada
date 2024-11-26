@@ -15,15 +15,14 @@ export class RecuperarPasswordService {
     const newPassword = this.generateRandomCode();
 
     try {
+      // Actualiza la contraseña del usuario
+      await this.userService.updateUserPassword(email, newPassword);
       // Enviar el correo con la nueva contraseña
       await this.sendPlainTextEmail(
         email,
         'Recuperación de contraseña de Gym App',
-        `Tu nueva contraseña temporal es: ${newPassword}`,
+        `Tu nueva contraseña temporal de Gym App es: ${newPassword}`,
       );
-
-      // Actualiza la contraseña del usuario
-      await this.userService.updateUserPassword(email, newPassword);
     } catch (error) {
       console.error('Error en la recuperación de contraseña:', error);
       throw error;

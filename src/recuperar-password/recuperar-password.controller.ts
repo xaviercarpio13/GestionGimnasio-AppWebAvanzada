@@ -7,11 +7,11 @@ export class RecuperarPasswordController {
 
   @Post('send')
   async sendEmail(@Body() body: { email: string}) {
-    const { email} = body;
+    const {email} = body;
 
     if (!email) {
       throw new HttpException(
-        'Faltan parámetros requeridos (email, idUsuario).',
+        'Faltan parámetros requeridos (email).',
         HttpStatus.BAD_REQUEST,
       );
     }
