@@ -60,6 +60,7 @@ export class SubscriptionsService {
     return this.prisma.suscripcion.update({
       where: { id },
       data: {
+        tipo: tipoSuscripcion,
         fechaFin: nuevaFechaFin,
       },
     });
